@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Radar — Documentary Source Intelligence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&family=Source+Serif+4:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-cream: #F4EFE6;
+      --bg-warm: #EDE8DF;
+      --bg-card: #FDFBF7;
+      --bg-hover: #F0EBE2;
+      --bg-expanded: #F9F6F0;
+      --text-dark: #1A1714;
+      --text-body: #2E2A24;
+      --text-secondary: #6B6359;
+      --text-muted: #9C9488;
+      --border: #D8D2C8;
+      --border-light: #E5E0D8;
+      --accent-red: #C4453C;
+      --accent-red-dim: rgba(196, 69, 60, 0.08);
+      --accent-red-light: rgba(196, 69, 60, 0.12);
+      --accent-gold: #8C7A38;
+      --accent-green: #5A7A4E;
+      --accent-grey: #7A756E;
+    }
+
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background-color: var(--bg-cream);
+      color: var(--text-body);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* HEADER */
+    .header {
+      background-color: var(--text-dark);
+      padding: 40px 48px 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .header-left h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: 0.2em;
+      color: var(--bg-cream);
+      margin-bottom: 6px;
+    }
+
+    .header-left p {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 11px;
+      color: #9C9488;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .header-right {
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 4px;
+      transition: opacity 0.3s;
+    }
+
+    .header-right:hover {
+      opacity: 0.7;
+    }
+
+    .settings-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9C9488;
+      font-size: 18px;
+    }
+
+    /* TABS AND FILTERS */
+    .controls {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 24px 48px;
+    }
+
+    .tab-group {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border-light);
+      padding-bottom: 0;
+    }
+
+    .tab-button {
+      padding: 10px 24px 14px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+      position: relative;
+      margin-bottom: -2px;
+    }
+
+    .tab-button:hover {
+      color: var(--text-secondary);
+    }
+
+    .tab-button.active {
+      color: var(--accent-red);
+      border-bottom-color: var(--accent-red);
+    }
+
+    .tab-count {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 6px;
+      font-weight: 300;
+    }
+
+    .tab-button.active .tab-count {
+      color: var(--accent-red);
+      opacity: 0.6;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      background-color: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 20px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      transition: all 0.3s;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--text-secondary);
+      color: var(--text-secondary);
+    }
+
+    .filter-pill.active {
+      background-color: var(--text-dark);
+      color: var(--bg-cream);
+      border-color: var(--text-dark);
+      font-weight: 500;
+    }
+
+    /* CONTENT AREA */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
+      background-color: var(--bg-cream);
+    }
+
+    .content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .content::-webkit-scrollbar-track {
+      background: var(--bg-cream);
+    }
+
+    .content::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    .entries-list {
+      padding: 0;
+    }
+
+    .entry {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      transition: background-color 0.2s;
+    }
+
+    .entry:hover {
+      background-color: var(--bg-hover);
+    }
+
+    .entry-header {
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .entry-chevron {
+      width: 16px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .entry.expanded .entry-chevron {
+      transform: rotate(90deg);
+      color: var(--accent-red);
+    }
+
+    .entry-genre {
+      padding: 4px 10px;
+      border-radius: 3px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      flex-shrink: 0;
+      min-width: 100px;
+    }
+
+    .genre-true-crime { background-color: rgba(196, 69, 60, 0.08); color: #B8453E; }
+    .genre-race-justice { background-color: rgba(58, 100, 140, 0.08); color: #3A648C; }
+    .genre-cult-control { background-color: rgba(120, 80, 130, 0.08); color: #785082; }
+    .genre-institutional-scandal { background-color: rgba(140, 122, 56, 0.08); color: #8C7A38; }
+    .genre-tech-power { background-color: rgba(90, 122, 78, 0.08); color: #5A7A4E; }
+    .genre-film-fame { background-color: rgba(180, 120, 50, 0.08); color: #A07830; }
+
+    .entry-title {
+      flex: 1;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-dark);
+      letter-spacing: 0.01em;
+    }
+
+    .entry-score {
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      background: rgba(90, 122, 78, 0.1);
+      color: var(--accent-green);
+      flex-shrink: 0;
+    }
+
+    .entry-meta {
+      flex: 0.4;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+
+    .entry-deal {
+      padding: 4px 10px;
+      border-radius: 3px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+      min-width: 110px;
+      text-align: center;
+    }
+
+    .deal-available { background-color: rgba(90, 122, 78, 0.1); color: var(--accent-green); }
+    .deal-unknown { background-color: rgba(122, 117, 110, 0.1); color: var(--accent-grey); }
+    .deal-optioned { background-color: rgba(196, 69, 60, 0.08); color: var(--accent-red); }
+
+    .entry-logline {
+      flex: 2;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-right: 16px;
+      line-height: 1.5;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .entry-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-small {
+      padding: 6px 14px;
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 3px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      transition: all 0.3s;
+    }
+
+    .btn-small:hover {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+      background-color: var(--accent-red-dim);
+    }
+
+    /* EXPANDED CONTENT */
+    .entry-expanded {
+      background-color: var(--bg-expanded);
+      border-top: 1px solid var(--border-light);
+      padding: 28px 48px 28px 80px;
+      display: none;
+    }
+
+    .entry.expanded .entry-expanded {
+      display: block;
+    }
+
+    .expanded-section {
+      margin-bottom: 24px;
+    }
+
+    .expanded-label {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent-red);
+      margin-bottom: 8px;
+    }
+
+    .expanded-content {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text-body);
+      font-weight: 400;
+    }
+
+    .expanded-link {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 8px 16px;
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 3px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      transition: all 0.3s;
+    }
+
+    .expanded-link:hover {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    .research-placeholder {
+      padding: 28px;
+      background-color: var(--bg-warm);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .research-data {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .research-field {
+      background-color: var(--bg-card);
+      padding: 14px 16px;
+      border-radius: 4px;
+      border: 1px solid var(--border-light);
+      border-left: 3px solid var(--accent-red);
+    }
+
+    .research-field-label {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-red);
+      margin-bottom: 6px;
+      opacity: 0.8;
+    }
+
+    .research-field-value {
+      font-size: 13px;
+      color: var(--text-body);
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    /* ARCHIVE MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(26, 23, 20, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 36px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text-dark);
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 14px;
+      background-color: var(--bg-cream);
+      border: 1px solid var(--border);
+      color: var(--text-body);
+      border-radius: 4px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      transition: border-color 0.3s;
+    }
+
+    .modal-input:focus {
+      outline: none;
+      border-color: var(--accent-red);
+    }
+
+    .modal-input::placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn-primary {
+      padding: 10px 22px;
+      background-color: var(--text-dark);
+      color: var(--bg-cream);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-red);
+    }
+
+    .btn-secondary {
+      padding: 10px 22px;
+      background-color: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-secondary);
+      color: var(--text-body);
+    }
+
+    /* SETTINGS PANEL */
+    .settings-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 420px;
+      height: 100vh;
+      background-color: var(--bg-card);
+      border-left: 1px solid var(--border);
+      padding: 36px;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 999;
+      box-shadow: -8px 0 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .settings-panel::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .settings-panel::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .settings-panel.active {
+      transform: translateX(0);
+    }
+
+    .settings-close {
+      font-size: 28px;
+      cursor: pointer;
+      margin-bottom: 28px;
+      color: var(--text-muted);
+      font-weight: 300;
+      transition: color 0.3s;
+    }
+
+    .settings-close:hover {
+      color: var(--accent-red);
+    }
+
+    .settings-section {
+      margin-bottom: 36px;
+    }
+
+    .settings-section-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-dark);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--text-dark);
+    }
+
+    .settings-item {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 14px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 400;
+    }
+
+    .settings-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--border);
+      border-radius: 20px;
+      transition: background-color 0.3s;
+    }
+
+    .toggle-slider::before {
+      content: "";
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background-color: var(--accent-red);
+    }
+
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(16px);
+    }
+
+    /* Preferences textarea */
+    .settings-textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 12px 14px;
+      background-color: var(--bg-cream);
+      border: 1px solid var(--border);
+      color: var(--text-body);
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      line-height: 1.6;
+      resize: vertical;
+      transition: border-color 0.3s;
+    }
+
+    .settings-textarea:focus {
+      outline: none;
+      border-color: var(--accent-red);
+    }
+
+    .settings-textarea::placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .settings-pref-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+
+    .settings-pref-label:first-child {
+      margin-top: 0;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1200px) {
+      .entry-header {
+        gap: 10px;
+      }
+
+      .entry-logline {
+        flex: 1;
+        margin-right: 8px;
+      }
+
+      .entry-meta {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        height: auto;
+      }
+
+      .header {
+        padding: 24px;
+      }
+
+      .controls {
+        padding: 16px 20px;
+      }
+
+      .entry-header {
+        flex-wrap: wrap;
+        padding: 14px 20px;
+      }
+
+      .entry-expanded {
+        padding: 20px;
+      }
+
+      .entry-logline {
+        flex: 100%;
+        margin-right: 0;
+        margin-top: 8px;
+      }
+
+      .settings-panel {
+        width: 100%;
+      }
+
+      .research-data {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-left">
+        <h1>THE RADAR</h1>
+        <p>Documentary Source Intelligence</p>
+      </div>
+      <div class="header-right" id="settingsToggle">
+        <div class="settings-icon">&#9881;</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="tab-group">
+        <button class="tab-button active" data-tab="inbox">
+          Inbox <span class="tab-count" id="inbox-count">(0)</span>
+        </button>
+        <button class="tab-button" data-tab="researched">
+          Researched <span class="tab-count" id="researched-count">(0)</span>
+        </button>
+        <button class="tab-button" data-tab="archived">
+          Archived <span class="tab-count" id="archived-count">(0)</span>
+        </button>
+      </div>
+
+      <div class="filter-pills" id="filterPills">
+        <!-- Genre pills are built dynamically from entry data -->
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="entries-list" id="entriesList"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="archiveModal">
+    <div class="modal-content">
+      <div class="modal-title">Archive Entry</div>
+      <input type="text" class="modal-input" id="archiveReason" placeholder="Reason for archiving (optional)">
+      <div class="modal-buttons">
+        <button class="btn-secondary" onclick="closeArchiveModal()">Cancel</button>
+        <button class="btn-primary" onclick="confirmArchive()">Archive</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-close" onclick="toggleSettings()">&times;</div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Preferences</div>
+      <div class="settings-pref-label">What I'm looking for</div>
+      <textarea class="settings-textarea" placeholder="e.g. True crime with institutional failure, investigative journalism that reveals hidden systems, stories with strong central characters and archival potential...">True crime with strong central characters. Investigative journalism that exposes institutional corruption or hidden systems. Stories with rich archival and footage potential. Subjects where access to key people is realistic. Anything with a ticking clock or dramatic question that sustains a feature or series.</textarea>
+      <div class="settings-pref-label">Not interested in</div>
+      <textarea class="settings-textarea" placeholder="e.g. Celebrity memoir, self-help, fiction adaptations...">Celebrity memoir or autobiography without investigative angle. Self-help, business advice, or lifestyle books. Fiction. Historical subjects without living witnesses or archival footage. Stories where rights are locked up by major studios.</textarea>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Sources — Investigative Journalism</div>
+      <div class="settings-item"><span>The New Yorker</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>The Atlantic</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>Guardian Long Read</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>ProPublica</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>The Intercept</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>Tortoise Media</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>New York Times Magazine</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Sources — True Crime & Justice</div>
+      <div class="settings-item"><span>CrimeReads</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>The Marshall Project</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>Injustice Watch</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Sources — Publishing & Industry</div>
+      <div class="settings-item"><span>Publishers Marketplace</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>Publishers Weekly</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>The Bookseller</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>Deadline</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>The Hollywood Reporter</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Sources — Podcasts to Books</div>
+      <div class="settings-item"><span>Serial</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>Radiolab</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>This American Life</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>Casefile</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Sources — Literary Prizes</div>
+      <div class="settings-item"><span>Pulitzer Prize (General Nonfiction)</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>Baillie Gifford Prize</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>National Book Award (Nonfiction)</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="settings-item"><span>Orwell Prize</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // CONFIG — fill in apiEndpoint after deploying Apps Script
+    // ============================================================
+    const CONFIG = {
+      // Paste your Apps Script Web App URL here after deployment:
+      // e.g. "https://script.google.com/macros/s/AKfycb.../exec"
+      apiEndpoint: "https://script.google.com/macros/s/AKfycbwGJxm_b8--A9maFBSJdkH5--Y_QbcA0u7zrQZYERhgd6se71h1dioNA558Vrptk8wo/exec",
+      // How long to wait for API response (ms)
+      fetchTimeout: 10000,
+    };
+
+    // ============================================================
+    // DEMO DATA — used when API is not configured or unreachable
+    // ============================================================
+    const DEMO_ENTRIES = [
+      {
+        id: 1,
+        title: "London Falling",
+        author: "Patrick Radden Keefe",
+        publisher: "Doubleday",
+        date: "April 2026",
+        genre: "true-crime",
+        deal: "unknown",
+        logline: "A 19-year-old falls from a London luxury flat. His parents discover he’d been posing as the son of a Russian oligarch. Keefe follows the money.",
+        pitch: "Zac Brettler died in 2019 after falling from a luxury apartment. His family discovered he’d been living a double life in London’s gilded underworld. Keefe builds outward from one death into a portrait of a city reshaped by unchecked wealth and corruption.",
+        whyNow: "Published April 2026. Keefe is the gold standard — Say Nothing, Empire of Pain. This is his most personal investigation yet.",
+        source: "Doubleday",
+        link: "https://www.penguinrandomhouse.com/books/704979/london-falling-by-patrick-radden-keefe/",
+        status: "inbox"
+      },
+      {
+        id: 2,
+        title: "American Reich",
+        author: "Eric Lichtblau",
+        publisher: "Little, Brown",
+        date: "January 2026",
+        genre: "race-justice",
+        deal: "unknown",
+        logline: "A gay Jewish college student is lured to his death by a neo-Nazi in Orange County. A Pulitzer winner follows the hate movement that made it possible.",
+        pitch: "Blaze Bernstein was a UPenn sophomore coaxed out for a rendezvous by Sam Woodward. Lichtblau uses the murder to trace the nationwide surge in violent white supremacy, arguing it’s unlike anything since the Civil Rights era.",
+        whyNow: "Published January 2026 into a climate where the subject couldn’t be more urgent. Lichtblau won the Pulitzer for his NYT work.",
+        source: "Little, Brown",
+        link: "https://www.hachettebookgroup.com/titles/eric-lichtblau/american-reich/9780316564717/",
+        status: "inbox"
+      },
+      {
+        id: 3,
+        title: "Cave Mountain",
+        author: "Benjamin Hale",
+        publisher: "Harper",
+        date: "March 2026",
+        genre: "cult-control",
+        deal: "unknown",
+        logline: "A six-year-old girl vanishes on an Arkansas mountain. The search uncovers a decades-old cult murder buried in the same soil.",
+        pitch: "In 2001, Hale’s cousin Haley got lost on Cave Mountain, triggering Arkansas’s largest search and rescue. The spot where she was found turned out to be yards from where a three-year-old was murdered and buried by a doomsday cult in 1978. True crime, memoir, and the dark history of the Ozarks braided together.",
+        whyNow: "Published March 2026. The personal connection — it’s Hale’s own family — gives it access and emotional stakes that pure journalism can’t match.",
+        source: "Harper / CrimeReads",
+        link: "https://www.amazon.com/Cave-Mountain-Disappearance-Reckoning-Ozarks/dp/0063398125",
+        status: "inbox"
+      },
+      {
+        id: 4,
+        title: "The Castle",
+        author: "Jon Ronson",
+        publisher: "Penguin",
+        date: "August 2026",
+        genre: "cult-control",
+        deal: "optioned",
+        logline: "Jon Ronson’s son is lured to a remote castle in New England under false pretences. What Ronson finds there is a generation of men unravelling.",
+        pitch: "Ronson’s first book in eleven years. When his son Joel is drawn to a mysterious gathering in a forest castle, Ronson follows — into a world of paroled murderers, unmoored men, YouTube radicalisation, and the collapse of male purpose in the 21st century. Darkly comic, deeply unsettling.",
+        whyNow: "Pre-order for August 2026. Ronson is a documentary-maker himself — his sensibility maps directly onto the form. Already optioned.",
+        source: "Penguin",
+        link: "https://www.penguin.co.uk/books/465102/the-castle-by-ronson-jon/",
+        status: "inbox"
+      },
+      {
+        id: 5,
+        title: "Five Bullets",
+        author: "Elliot Williams",
+        publisher: "Penguin Random House",
+        date: "January 2026",
+        genre: "race-justice",
+        deal: "unknown",
+        logline: "1984. A white man shoots four Black teenagers on a New York subway. The city calls him a hero. What happened next shaped America.",
+        pitch: "Williams revisits the Bernie Goetz shooting — the moment New York’s fear and racial tension crystallised into a single act of violence. Deep legal and social context, drawing a line from Reagan-era vigilante worship to the present.",
+        whyNow: "Published January 2026. The vigilante question — who gets to use violence and be celebrated for it — is as live as ever.",
+        source: "Penguin Random House",
+        link: "https://www.penguinrandomhouse.com/books/768052/five-bullets-by-elliot-williams/",
+        status: "inbox"
+      },
+      {
+        id: 6,
+        title: "Injustice Town",
+        author: "Rick Tulsky",
+        publisher: "Simon & Schuster",
+        date: "2026",
+        genre: "institutional-scandal",
+        deal: "unknown",
+        logline: "A 17-year-old convicted of murder on fabricated evidence. The cop who framed him was later indicted for serial abuse of women.",
+        pitch: "Lamonte McIntyre spent 23 years in prison for a murder he didn’t commit. Tulsky — a Pulitzer-winning journalist — exposes the corrupt cops, incompetent lawyers, and a judge with a secret relationship with the prosecutor. McIntyre was exonerated in 2017, but the system that destroyed his life faced no consequences.",
+        whyNow: "Published 2026. Named a New Yorker Best Book. The wrongful conviction genre is proven documentary territory (Making a Murderer, The Innocence Files).",
+        source: "Simon & Schuster",
+        link: "https://www.simonandschuster.com/books/Injustice-Town/Rick-Tulsky/9798897100422",
+        status: "inbox"
+      },
+      {
+        id: 7,
+        title: "How to Rule the World",
+        author: "Theo Baker",
+        publisher: "Penguin Random House",
+        date: "May 2026",
+        genre: "tech-power",
+        deal: "optioned",
+        logline: "A Stanford freshman’s investigation forces the university president to resign. Then he looks at what Stanford is actually built to produce.",
+        pitch: "Baker’s reporting uncovered two decades of unreported research misconduct — including a study claiming to have found the cause of Alzheimer’s — and brought down Stanford’s president. The youngest-ever George Polk Award winner. The book asks what happens when an elite institution is engineered to produce power, not knowledge.",
+        whyNow: "Published May 2026, already optioned for a film. Named a NYT Most Anticipated Book of 2026.",
+        source: "PRH / The Atlantic (excerpted)",
+        link: "https://www.penguinrandomhouse.com/books/760317/how-to-rule-the-world-by-theo-baker/",
+        status: "inbox"
+      },
+      {
+        id: 8,
+        title: "Black Dahlia",
+        author: "William J. Mann",
+        publisher: "Simon & Schuster",
+        date: "January 2026",
+        genre: "true-crime",
+        deal: "unknown",
+        logline: "The most famous unsolved murder in Hollywood history. Mann finally humanises the victim and names a suspect.",
+        pitch: "Elizabeth Short has been reduced to a lurid nickname for 80 years. Mann rebuilds her as a real person — curious, ambitious, trapped in postwar Hollywood — then follows the investigation through official records, interviews with people who knew the original investigators, and previously unpublished evidence.",
+        whyNow: "Published January 2026. 464 pages of new reporting on a case that’s been mythologised into meaninglessness. Mann (Tinseltown, Bogart) knows Hollywood’s dark history better than anyone.",
+        source: "Simon & Schuster",
+        link: "https://www.simonandschuster.com/books/Black-Dahlia/William-J-Mann/9781668075906",
+        status: "inbox"
+      }
+    ];
+
+    const DEMO_RESEARCH = {
+      1: {
+        "Film/TV Rights": "Available",
+        "Underlying Rights Holder": "Patrick Radden Keefe / Doubleday",
+        "Key Subjects": "Brettler family, Russian oligarch connections, London financial underworld figures",
+        "Archival & Footage": "London luxury flat, financial records, social media archives, 2019 news coverage",
+        "Access": "Family approval likely; oligarch access problematic",
+        "Competing Projects": "None identified (April 2026 publication)",
+        "Format": "Feature documentary (90–120 min) or limited series (3–4 parts)",
+        "Comparable Docs": "Fyre: The Greatest Party That Never Happened, The Toys That Made Us (wealth subculture angle)",
+        "Central Question": "What price does privilege exact on a young person who tries to buy entry into a world that will never accept him?"
+      },
+      2: {
+        "Film/TV Rights": "Available",
+        "Underlying Rights Holder": "Eric Lichtblau / Little, Brown",
+        "Key Subjects": "Blaze Bernstein’s family, Sam Woodward, Orange County law enforcement, white supremacist network members",
+        "Archival & Footage": "Bernstein family archive, Woodward trial footage, hate group propaganda (careful licensing), Orange County locations",
+        "Access": "Family likely cooperative; supremacist network access risky",
+        "Competing Projects": "None identified (January 2026)",
+        "Format": "Feature documentary or limited series",
+        "Comparable Docs": "Hate Group (HBO), The Slap (ESPN), American: The Bill Hicks Story (cultural moment investigation)",
+        "Central Question": "How does a hate movement radicalise ordinary people, and who bears responsibility when young men die as a result?"
+      },
+      3: {
+        "Film/TV Rights": "Available",
+        "Underlying Rights Holder": "Benjamin Hale / Harper",
+        "Key Subjects": "Benjamin Hale, Haley Dunn (subject), Hale family, cult survivors from 1978 case, Ozark locals",
+        "Archival & Footage": "Cave Mountain location, 2001 search & rescue footage, 1978 cult case files, Ozark landscape archive",
+        "Access": "Hale has direct family access; some cult survivors may be identifiable",
+        "Competing Projects": "None identified (March 2026)",
+        "Format": "Feature documentary (90 min) with strong memoir angle",
+        "Comparable Docs": "Stolen Youth, The Disappearance of Stephanie Mailer (family investigation), Unrest (personal stakes in larger mystery)",
+        "Central Question": "How does a family’s search for one lost person unearth the buried secrets of a region?"
+      },
+      4: {
+        "Film/TV Rights": "Optioned for film",
+        "Underlying Rights Holder": "Jon Ronson / Penguin (optioned party unknown)",
+        "Key Subjects": "Jon Ronson, Joel Ronson, castle inhabitants, paroled murderers, male identity crisis in digital age",
+        "Archival & Footage": "Castle location (access TBD), YouTube radicalisation pathways, Ronson’s own documentary archive",
+        "Access": "Ronson is cooperative documentary-maker; castle residents may resist",
+        "Competing Projects": "Film option already in place",
+        "Format": "Limited series (6–8 parts) or feature documentary",
+        "Comparable Docs": "The Social Dilemma, Losers, The Toys That Made Us (male identity focus), Fyre",
+        "Central Question": "What happens when men have no legitimate path to meaning, and the internet offers them radical alternatives?"
+      },
+      5: {
+        "Film/TV Rights": "Available",
+        "Underlying Rights Holder": "Elliot Williams / Penguin Random House",
+        "Key Subjects": "Bernie Goetz, Yusef Hawkins (not primary but contextual), NYC subway system, 1980s NYC culture, vigilante justice debate",
+        "Archival & Footage": "Goetz trial footage, 1984 NYC news archive, subway system documentation, contemporary reactions",
+        "Access": "Goetz is polarising; legal considerations for depicting teens",
+        "Competing Projects": "None identified (January 2026)",
+        "Format": "Feature documentary (90–120 min) or limited series (3–4 parts)",
+        "Comparable Docs": "The Two Killings of Sam Shepherd, Killing Fields, LA 92 (moment in racial history)",
+        "Central Question": "When fear and racial anxiety crystallise into violence, who becomes the hero and why?"
+      },
+      6: {
+        "Film/TV Rights": "Available",
+        "Underlying Rights Holder": "Rick Tulsky / Simon & Schuster",
+        "Key Subjects": "Lamonte McIntyre, corrupt cops, incompetent lawyers, judge misconduct, Kansas criminal justice system",
+        "Archival & Footage": "Trial footage, Kansas archives, police records, McIntyre’s prison years documentation",
+        "Access": "McIntyre likely cooperative (exoneree); cops/judge will resist",
+        "Competing Projects": "None identified (2026 publication)",
+        "Format": "Feature documentary (90 min) or limited series (4 parts)",
+        "Comparable Docs": "Making a Murderer, The Innocence Files, West of Memphis (wrongful conviction proven)",
+        "Central Question": "What does it take for a system designed to deliver justice to finally admit it destroyed an innocent man’s life?"
+      },
+      7: {
+        "Film/TV Rights": "Optioned for film",
+        "Underlying Rights Holder": "Theo Baker / Penguin Random House (optioned party unknown)",
+        "Key Subjects": "Theo Baker, Stanford president, research scientists involved in misconduct, Stanford institutional culture",
+        "Archival & Footage": "Stanford campus, lab documentation, university archives, Baker’s reporting process",
+        "Access": "Baker is young, cooperative journalist; Stanford will resist institutional scrutiny",
+        "Competing Projects": "Film option already in place",
+        "Format": "Feature documentary or limited series (5 parts)",
+        "Comparable Docs": "Enron, The Inventor: Out for Blood in Silicon Valley, The Toys That Made Us (institution critique)",
+        "Central Question": "How does prestige itself become a corrupting force within institutions meant to serve knowledge?"
+      },
+      8: {
+        "Film/TV Rights": "Available",
+        "Underlying Rights Holder": "William J. Mann / Simon & Schuster",
+        "Key Subjects": "Elizabeth Short (deceased but reconstructed), William J. Mann (investigator), original detectives’ successors, suspect identification",
+        "Archival & Footage": "Los Angeles 1947 archive, crime scene documentation, newspaper archives, Mann’s research process",
+        "Access": "Deceased subject reduces privacy concerns; suspect family may resist",
+        "Competing Projects": "None identified (January 2026) — decades of obsession with this case but few recent major projects",
+        "Format": "Feature documentary (90–120 min) with procedural element",
+        "Comparable Docs": "Unsolved Mysteries, The Killing of Yanny Means (cold cases, Hollywood history), JonBenét: An American Murder Mystery",
+        "Central Question": "Can humanising a victim of a famous crime rescue her from myth and return her to reality?"
+      }
+    };
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let entries = [...DEMO_ENTRIES];
+    let researchData = { ...DEMO_RESEARCH };
+    let currentTab = "inbox";
+    let currentGenreFilter = "all";
+    let archivingEntryId = null;
+    let isLive = false; // true when entries came from the API
+
+    // ============================================================
+    // API — fetch entries from Google Sheet via Apps Script
+    // ============================================================
+
+    function toKebab(str) {
+      // Convert genre strings to kebab-case slugs for CSS classes
+      // e.g. "True Crime" → "true-crime", "Science & Environment" → "science-environment"
+      return (str || "")
+        .toLowerCase()
+        .replace(/&/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+    }
+
+    // Genre display names keyed by slug
+    const GENRE_LABELS = {
+      "true-crime": "True Crime",
+      "institutional-scandal": "Institutional Scandal",
+      "cult-control": "Cult & Control",
+      "race-justice": "Race & Justice",
+      "tech-power": "Tech & Power",
+      "film-fame": "Film & Fame",
+      "investigative": "Investigative",
+      "social-issues": "Social Issues",
+      "historical": "Historical",
+      "science-environment": "Science & Environment",
+      "art-culture": "Art & Culture",
+    };
+
+    function mapApiItem(item) {
+      // Map the Apps Script response shape → frontend entry shape
+      const genre = toKebab(item.genre || "");
+      let deal = "unknown";
+      const summary = (item.summary || "").toLowerCase();
+      if (summary.includes("optioned") || summary.includes("option")) deal = "optioned";
+      else if (summary.includes("rights available") || summary.includes("available")) deal = "available";
+
+      // Map API status → frontend status
+      let status = (item.status || "new").toLowerCase();
+      if (status === "new") status = "inbox";
+      if (status === "liked") status = "researched";
+
+      // Parse research_data if present (stored as JSON string in sheet)
+      let research = null;
+      if (item.research_data) {
+        try {
+          research = typeof item.research_data === "string"
+            ? JSON.parse(item.research_data)
+            : item.research_data;
+        } catch (e) { /* ignore parse errors */ }
+      }
+
+      return {
+        id: item.id,
+        title: item.title || "Untitled",
+        author: item.author || "",
+        publisher: item.publisher || "",
+        date: item.date_added || item.date || "",
+        genre: genre,
+        deal: deal,
+        logline: item.summary || "",
+        pitch: item.relevance_note || item.summary || "",
+        whyNow: item.relevance_note || "",
+        source: item.source_name || "",
+        link: item.source_url || "",
+        status: status,
+        score: item.score || 0,
+        _research: research,
+      };
+    }
+
+    async function loadEntries() {
+      if (!CONFIG.apiEndpoint) {
+        console.log("No API endpoint configured — using demo data");
+        entries = [...DEMO_ENTRIES];
+        researchData = { ...DEMO_RESEARCH };
+        isLive = false;
+        renderEntries();
+        buildGenreFilters();
+        showDataSource();
+        return;
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), CONFIG.fetchTimeout);
+
+        const resp = await fetch(CONFIG.apiEndpoint + "?action=items", {
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+
+        if (!resp.ok) throw new Error("API returned " + resp.status);
+        const data = await resp.json();
+
+        if (!data.items || data.items.length === 0) {
+          console.log("API returned no items — using demo data");
+          entries = [...DEMO_ENTRIES];
+          researchData = { ...DEMO_RESEARCH };
+          isLive = false;
+        } else {
+          entries = data.items.map(mapApiItem);
+          // Build researchData from any _research fields
+          researchData = {};
+          entries.forEach(e => {
+            if (e._research) {
+              researchData[e.id] = e._research;
+              delete e._research;
+            }
+          });
+          isLive = true;
+          console.log("Loaded " + entries.length + " items from API");
+        }
+      } catch (err) {
+        console.warn("API fetch failed, using demo data:", err.message);
+        entries = [...DEMO_ENTRIES];
+        researchData = { ...DEMO_RESEARCH };
+        isLive = false;
+      }
+
+      renderEntries();
+      buildGenreFilters();
+      showDataSource();
+    }
+
+    // ============================================================
+    // API — post feedback to Google Sheet
+    // ============================================================
+
+    async function postFeedback(itemId, action, reason) {
+      if (!CONFIG.apiEndpoint || !isLive) {
+        console.log("Feedback saved locally (demo mode)");
+        return;
+      }
+
+      const entry = entries.find(e => e.id === itemId);
+
+      try {
+        await fetch(CONFIG.apiEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "feedback",
+            itemId: itemId,
+            title: entry ? entry.title : "",
+            feedbackAction: action,  // "archived", "researched", "more_like_this"
+            reason: reason || "",
+            timestamp: new Date().toISOString(),
+          }),
+        });
+        console.log("Feedback posted:", action, itemId);
+      } catch (err) {
+        console.warn("Failed to post feedback:", err.message);
+      }
+    }
+
+    // ============================================================
+    // DYNAMIC GENRE FILTERS
+    // ============================================================
+
+    function buildGenreFilters() {
+      const container = document.getElementById("filterPills");
+      // Collect unique genres from current entries
+      const genres = [...new Set(entries.map(e => e.genre).filter(Boolean))];
+      genres.sort();
+
+      container.innerHTML = "";
+
+      // "All Genres" pill
+      const allPill = document.createElement("button");
+      allPill.className = "filter-pill" + (currentGenreFilter === "all" ? " active" : "");
+      allPill.dataset.genre = "all";
+      allPill.textContent = "All Genres";
+      allPill.addEventListener("click", handlePillClick);
+      container.appendChild(allPill);
+
+      genres.forEach(slug => {
+        const pill = document.createElement("button");
+        pill.className = "filter-pill" + (currentGenreFilter === slug ? " active" : "");
+        pill.dataset.genre = slug;
+        pill.textContent = GENRE_LABELS[slug] || slug.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+        pill.addEventListener("click", handlePillClick);
+        container.appendChild(pill);
+      });
+    }
+
+    function handlePillClick() {
+      document.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
+      this.classList.add("active");
+      currentGenreFilter = this.dataset.genre;
+      renderEntries();
+    }
+
+    // ============================================================
+    // DATA SOURCE INDICATOR
+    // ============================================================
+
+    function showDataSource() {
+      let badge = document.getElementById("dataSourceBadge");
+      if (!badge) {
+        badge = document.createElement("div");
+        badge.id = "dataSourceBadge";
+        badge.style.cssText = "position:fixed;bottom:16px;right:16px;padding:6px 14px;border-radius:20px;font-size:11px;font-family:’Source Serif 4’,serif;letter-spacing:0.5px;opacity:0.7;z-index:100;";
+        document.body.appendChild(badge);
+      }
+      if (isLive) {
+        badge.textContent = "LIVE";
+        badge.style.background = "#2d5016";
+        badge.style.color = "#c4ddb0";
+      } else {
+        badge.textContent = "DEMO DATA";
+        badge.style.background = "#5a4a3a";
+        badge.style.color = "#d4c4a8";
+      }
+    }
+
+    // ============================================================
+    // RENDERING
+    // ============================================================
+
+    function getGenreClass(genre) {
+      return `genre-${genre.replace(" ", "-").toLowerCase()}`;
+    }
+
+    function getDealClass(deal) {
+      return `deal-${deal.toLowerCase()}`;
+    }
+
+    function getDealText(deal) {
+      if (deal === "unknown") return "Rights Unknown";
+      if (deal === "available") return "Rights Available";
+      if (deal === "optioned") return "Optioned";
+      return deal;
+    }
+
+    function renderEntries() {
+      const container = document.getElementById("entriesList");
+      container.innerHTML = "";
+
+      const filtered = entries.filter(e => {
+        const tabMatch = e.status === currentTab;
+        const genreMatch = currentGenreFilter === "all" || e.genre === currentGenreFilter;
+        return tabMatch && genreMatch;
+      });
+
+      filtered.forEach(entry => {
+        const entryEl = document.createElement("div");
+        entryEl.className = "entry";
+        entryEl.dataset.id = entry.id;
+
+        const genreLabel = GENRE_LABELS[entry.genre] || entry.genre.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+
+        const metaParts = [entry.author, entry.publisher, entry.date].filter(Boolean);
+        const metaText = metaParts.join(" — ");
+
+        const scoreHTML = entry.score ? `<div class="entry-score" title="Relevance score">${entry.score}/10</div>` : "";
+
+        const headerHTML = `
+          <div class="entry-header" onclick="toggleExpand(this)">
+            <div class="entry-chevron">▸</div>
+            <div class="entry-genre ${getGenreClass(entry.genre)}">
+              ${genreLabel}
+            </div>
+            <div class="entry-title">${entry.title}</div>
+            ${scoreHTML}
+            <div class="entry-deal ${getDealClass(entry.deal)}">${getDealText(entry.deal)}</div>
+            <div class="entry-logline">${entry.logline}</div>
+            <div class="entry-meta">${metaText}</div>
+            <div class="entry-actions">
+              <button class="btn-small" onclick="openResearch(event, ‘${entry.id}’)">Research</button>
+              <button class="btn-small" onclick="openArchiveModal(event, ‘${entry.id}’)">Archive</button>
+            </div>
+          </div>
+        `;
+
+        const pitchContent = entry.pitch || entry.logline;
+        const whyNowContent = entry.whyNow || "";
+
+        const expandedHTML = `
+          <div class="entry-expanded">
+            ${pitchContent ? `<div class="expanded-section">
+              <div class="expanded-label">Pitch</div>
+              <div class="expanded-content">${pitchContent}</div>
+            </div>` : ""}
+            ${whyNowContent ? `<div class="expanded-section">
+              <div class="expanded-label">Why Now</div>
+              <div class="expanded-content">${whyNowContent}</div>
+            </div>` : ""}
+            <div class="expanded-section">
+              <div class="expanded-label">Meta</div>
+              <div class="expanded-content">
+                <strong>Format:</strong> Documentary<br>
+                <strong>Source:</strong> ${entry.source}
+              </div>
+            </div>
+            ${entry.link ? `<div class="expanded-section">
+              <a href="${entry.link}" target="_blank" class="expanded-link">View Full Entry →</a>
+            </div>` : ""}
+          </div>
+        `;
+
+        entryEl.innerHTML = headerHTML + expandedHTML;
+        container.appendChild(entryEl);
+      });
+
+      updateTabCounts();
+    }
+
+    function toggleExpand(headerEl) {
+      const entry = headerEl.closest(".entry");
+      entry.classList.toggle("expanded");
+    }
+
+    function updateTabCounts() {
+      document.getElementById("inbox-count").textContent = `(${entries.filter(e => e.status === "inbox").length})`;
+      document.getElementById("researched-count").textContent = `(${entries.filter(e => e.status === "researched").length})`;
+      document.getElementById("archived-count").textContent = `(${entries.filter(e => e.status === "archived").length})`;
+    }
+
+    // ============================================================
+    // ACTIONS — Research & Archive (with API feedback)
+    // ============================================================
+
+    function openResearch(event, entryId) {
+      event.stopPropagation();
+      const entry = entries.find(e => String(e.id) === String(entryId));
+      if (!entry) return;
+      const entryEl = document.querySelector(`[data-id="${entryId}"]`);
+      const expandedSection = entryEl.querySelector(".entry-expanded");
+
+      let researchHTML = `
+        <div class="expanded-section">
+          <div class="expanded-label">Research Brief for: ${entry.title}</div>
+      `;
+
+      if (researchData[entryId]) {
+        researchHTML += ‘<div class="research-data">’;
+        Object.entries(researchData[entryId]).forEach(([label, value]) => {
+          researchHTML += `
+            <div class="research-field">
+              <div class="research-field-label">${label}</div>
+              <div class="research-field-value">${value}</div>
+            </div>
+          `;
+        });
+        researchHTML += ‘</div>’;
+
+        entry.status = "researched";
+        currentTab = "researched";
+
+        // Post feedback to API
+        postFeedback(entryId, "researched", "User requested research brief");
+      } else {
+        researchHTML += ‘<div class="research-placeholder">Your research brief will appear within 10 minutes</div>’;
+
+        // Still mark as researched and post feedback — the brief is pending
+        entry.status = "researched";
+        currentTab = "researched";
+        postFeedback(entryId, "researched", "Research brief requested (pending generation)");
+      }
+
+      researchHTML += ‘</div>’;
+
+      const existingResearch = expandedSection.querySelector(‘.research-data’) || expandedSection.querySelector(‘.research-placeholder’);
+      if (existingResearch) {
+        existingResearch.parentElement.remove();
+      }
+
+      const newSection = document.createElement("div");
+      newSection.innerHTML = researchHTML;
+      expandedSection.appendChild(newSection.firstElementChild);
+
+      const tabButtons = document.querySelectorAll(".tab-button");
+      tabButtons.forEach(btn => btn.classList.remove("active"));
+      document.querySelector(`[data-tab="researched"]`).classList.add("active");
+
+      renderEntries();
+    }
+
+    function openArchiveModal(event, entryId) {
+      event.stopPropagation();
+      archivingEntryId = entryId;
+      document.getElementById("archiveModal").classList.add("active");
+      document.getElementById("archiveReason").value = "";
+      document.getElementById("archiveReason").focus();
+    }
+
+    function closeArchiveModal() {
+      document.getElementById("archiveModal").classList.remove("active");
+      archivingEntryId = null;
+    }
+
+    function confirmArchive() {
+      if (archivingEntryId) {
+        const entry = entries.find(e => String(e.id) === String(archivingEntryId));
+        if (!entry) return;
+        const reason = document.getElementById("archiveReason").value || "";
+        entry.status = "archived";
+
+        // Post feedback to API
+        postFeedback(archivingEntryId, "archived", reason);
+
+        closeArchiveModal();
+        renderEntries();
+      }
+    }
+
+    function toggleSettings() {
+      document.getElementById("settingsPanel").classList.toggle("active");
+    }
+
+    // ============================================================
+    // EVENT LISTENERS
+    // ============================================================
+
+    document.getElementById("settingsToggle").addEventListener("click", toggleSettings);
+
+    document.querySelectorAll(".tab-button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentTab = btn.dataset.tab;
+        renderEntries();
+      });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeArchiveModal();
+        toggleSettings();
+      }
+    });
+
+    // ============================================================
+    // INIT — show demo data instantly, then try API in background
+    // ============================================================
+    entries = [...DEMO_ENTRIES];
+    researchData = { ...DEMO_RESEARCH };
+    renderEntries();
+    buildGenreFilters();
+    showDataSource();
+
+    // Try live API in background — replaces demo if it works
+    if (CONFIG.apiEndpoint) {
+      loadEntries();
+    }
+  </script>
+</body>
+</html>
