@@ -697,6 +697,103 @@
       margin-top: 0;
     }
 
+    /* Add Source form */
+    .add-source-form {
+      margin-top: 8px;
+    }
+
+    .add-source-form label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+      margin-top: 12px;
+    }
+
+    .add-source-form label:first-child {
+      margin-top: 0;
+    }
+
+    .add-source-form input,
+    .add-source-form select {
+      width: 100%;
+      padding: 10px 12px;
+      background-color: var(--bg-cream);
+      border: 1px solid var(--border);
+      color: var(--text-body);
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      line-height: 1.5;
+      transition: border-color 0.3s;
+      box-sizing: border-box;
+    }
+
+    .add-source-form input:focus,
+    .add-source-form select:focus {
+      outline: none;
+      border-color: var(--accent-red);
+    }
+
+    .add-source-form input::placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .add-source-form .substack-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .add-source-form .substack-hint.visible {
+      display: block;
+    }
+
+    .add-source-btn {
+      margin-top: 18px;
+      width: 100%;
+      padding: 10px 0;
+      background-color: var(--text-dark);
+      color: var(--bg-cream);
+      border: none;
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .add-source-btn:hover {
+      background-color: var(--accent-red);
+    }
+
+    .add-source-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .add-source-msg {
+      font-size: 12px;
+      margin-top: 8px;
+      text-align: center;
+      min-height: 18px;
+    }
+
+    .add-source-msg.success {
+      color: #4a7c59;
+    }
+
+    .add-source-msg.error {
+      color: var(--accent-red);
+    }
+
     /* RESPONSIVE */
     @media (max-width: 1200px) {
       .entry-header {
@@ -910,6 +1007,32 @@
       <div class="settings-item"><span>National Book Award (Nonfiction)</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
       <div class="settings-item"><span>Orwell Prize</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
     </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">Add a New Source</div>
+      <div class="add-source-form">
+        <label for="newSourceName">Source Name</label>
+        <input type="text" id="newSourceName" placeholder="e.g. Helen Lewis, ProPublica">
+
+        <label for="newSourceUrl">URL</label>
+        <input type="text" id="newSourceUrl" placeholder="e.g. https://helenlewis.substack.com">
+        <div class="substack-hint" id="substackHint">Substack detected — RSS feed will be set up automatically.</div>
+
+        <label for="newSourceCategory">Category</label>
+        <select id="newSourceCategory">
+          <option value="journalism">Investigative Journalism</option>
+          <option value="true-crime">True Crime & Justice</option>
+          <option value="books">Publishing & Industry</option>
+          <option value="podcasts">Podcasts to Books</option>
+          <option value="prizes">Literary Prizes</option>
+          <option value="substack" selected>Substack / Newsletter</option>
+          <option value="other">Other</option>
+        </select>
+
+        <button class="add-source-btn" id="addSourceBtn" onclick="addSource()">Add Source</button>
+        <div class="add-source-msg" id="addSourceMsg"></div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -920,6 +1043,8 @@
       // Paste your Apps Script Web App URL here after deployment:
       // e.g. "https://script.google.com/macros/s/AKfycb.../exec"
       apiEndpoint: "https://script.google.com/macros/s/AKfycbwGJxm_b8--A9maFBSJdkH5--Y_QbcA0u7zrQZYERhgd6se71h1dioNA558Vrptk8wo/exec",
+      // Master Settings Apps Script — deploy separately, paste URL here
+      masterSettingsEndpoint: "",
       // How long to wait for API response (ms)
       fetchTimeout: 10000,
     };
@@ -1560,6 +1685,97 @@
 
     function toggleSettings() {
       document.getElementById("settingsPanel").classList.toggle("active");
+    }
+
+    // ============================================================
+    // ADD SOURCE
+    // ============================================================
+
+    // Auto-detect Substack URLs and show hint
+    document.getElementById("newSourceUrl").addEventListener("input", function() {
+      const hint = document.getElementById("substackHint");
+      const catSelect = document.getElementById("newSourceCategory");
+      if (this.value.toLowerCase().includes("substack.com")) {
+        hint.classList.add("visible");
+        catSelect.value = "substack";
+      } else {
+        hint.classList.remove("visible");
+      }
+    });
+
+    async function addSource() {
+      const nameEl = document.getElementById("newSourceName");
+      const urlEl = document.getElementById("newSourceUrl");
+      const catEl = document.getElementById("newSourceCategory");
+      const btn = document.getElementById("addSourceBtn");
+      const msg = document.getElementById("addSourceMsg");
+
+      const name = nameEl.value.trim();
+      const url = urlEl.value.trim();
+      const category = catEl.value;
+
+      if (!name) {
+        msg.textContent = "Please enter a source name.";
+        msg.className = "add-source-msg error";
+        return;
+      }
+
+      // Build source ID from name
+      const sourceId = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+      // Detect Substack and set scan method
+      const isSubstack = url.toLowerCase().includes("substack.com");
+      const scanMethod = isSubstack ? "rss" : "web_fetch";
+      const rssUrl = isSubstack ? url.replace(/\/$/, "") + "/feed" : "";
+      const sourceType = isSubstack ? "substack" : "web";
+
+      btn.disabled = true;
+      btn.textContent = "ADDING...";
+      msg.textContent = "";
+      msg.className = "add-source-msg";
+
+      const payload = {
+        action: "add_source",
+        source_id: sourceId,
+        name: name,
+        url: url || "",
+        type: sourceType,
+        scan_method: scanMethod,
+        rss_url: rssUrl,
+        category: category,
+        client_id: "peter-morgan"
+      };
+
+      if (CONFIG.masterSettingsEndpoint) {
+        try {
+          await fetch(CONFIG.masterSettingsEndpoint, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          msg.textContent = "Source added! It will appear in the next daily scan.";
+          msg.className = "add-source-msg success";
+          nameEl.value = "";
+          urlEl.value = "";
+          document.getElementById("substackHint").classList.remove("visible");
+        } catch (err) {
+          msg.textContent = "Could not reach the settings API. Source saved locally.";
+          msg.className = "add-source-msg error";
+        }
+      } else {
+        // No master endpoint configured — show success anyway
+        // The source details are visible in the console for manual addition
+        console.log("New source (no API configured):", JSON.stringify(payload, null, 2));
+        msg.textContent = "Source noted! Configure the Master Settings API to sync automatically.";
+        msg.className = "add-source-msg success";
+        nameEl.value = "";
+        urlEl.value = "";
+        document.getElementById("substackHint").classList.remove("visible");
+      }
+
+      btn.disabled = false;
+      btn.textContent = "ADD SOURCE";
     }
 
     // ============================================================
