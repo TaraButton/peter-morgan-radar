@@ -749,10 +749,70 @@
         grid-template-columns: 1fr;
       }
     }
+    /* ── Password Gate ── */
+    .auth-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #1a1a1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .auth-gate.hidden { display: none; }
+    .auth-gate h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: #F4EFE6;
+      margin-bottom: 6px;
+    }
+    .auth-gate p {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8a8278;
+      margin-bottom: 40px;
+    }
+    .auth-gate input {
+      width: 280px;
+      padding: 12px 16px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 14px;
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 4px;
+      color: #F4EFE6;
+      text-align: center;
+      letter-spacing: 0.05em;
+      outline: none;
+    }
+    .auth-gate input:focus { border-color: #6a6a5a; }
+    .auth-gate input::placeholder { color: #5a5a52; }
+    .auth-gate .auth-error {
+      margin-top: 12px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 12px;
+      color: #c4453c;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .auth-gate .auth-error.visible { opacity: 1; }
   </style>
 </head>
 <body>
-  <div class="container">
+  <!-- Password Gate -->
+  <div class="auth-gate" id="authGate">
+    <h1>T H E &nbsp; R A D A R</h1>
+    <p>Documentary Source Intelligence</p>
+    <input type="password" id="authInput" placeholder="Enter password" autofocus>
+    <div class="auth-error" id="authError">Incorrect password</div>
+  </div>
+
+  <div class="container" id="mainApp" style="display:none;">
     <div class="header">
       <div class="header-left">
         <h1>THE RADAR</h1>
@@ -1537,6 +1597,37 @@
     if (CONFIG.apiEndpoint) {
       loadEntries();
     }
+  </script>
+
+  <!-- Password Gate Script -->
+  <script>
+    const PASS_HASH = "a8643360e41eee9395667caaac95bce48573193d86aec19b6695c356fdc50e9b";
+
+    async function sha256(text) {
+      const data = new TextEncoder().encode(text);
+      const buf = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    // Check if already authenticated this session
+    if (sessionStorage.getItem("radar_auth") === "1") {
+      document.getElementById("authGate").classList.add("hidden");
+      document.getElementById("mainApp").style.display = "";
+    }
+
+    document.getElementById("authInput").addEventListener("keydown", async (e) => {
+      if (e.key !== "Enter") return;
+      const hash = await sha256(e.target.value);
+      if (hash === PASS_HASH) {
+        sessionStorage.setItem("radar_auth", "1");
+        document.getElementById("authGate").classList.add("hidden");
+        document.getElementById("mainApp").style.display = "";
+      } else {
+        document.getElementById("authError").classList.add("visible");
+        e.target.value = "";
+        setTimeout(() => document.getElementById("authError").classList.remove("visible"), 2000);
+      }
+    });
   </script>
 </body>
 </html>
