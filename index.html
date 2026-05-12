@@ -715,8 +715,7 @@
       margin-top: 0;
     }
 
-    .add-source-form input,
-    .add-source-form select {
+    .add-source-form input {
       width: 100%;
       padding: 10px 12px;
       background-color: var(--bg-cream);
@@ -730,8 +729,7 @@
       box-sizing: border-box;
     }
 
-    .add-source-form input:focus,
-    .add-source-form select:focus {
+    .add-source-form input:focus {
       outline: none;
       border-color: var(--accent-red);
     }
@@ -741,16 +739,8 @@
       font-style: italic;
     }
 
-    .add-source-form .substack-hint {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-style: italic;
-      margin-top: 4px;
-      display: none;
-    }
-
-    .add-source-form .substack-hint.visible {
-      display: block;
+    .add-source-form label {
+      line-height: 1.5;
     }
 
     .add-source-btn {
@@ -1011,23 +1001,8 @@
     <div class="settings-section">
       <div class="settings-section-title">Add a New Source</div>
       <div class="add-source-form">
-        <label for="newSourceName">Source Name</label>
-        <input type="text" id="newSourceName" placeholder="e.g. Helen Lewis, ProPublica">
-
-        <label for="newSourceUrl">URL</label>
-        <input type="text" id="newSourceUrl" placeholder="e.g. https://helenlewis.substack.com">
-        <div class="substack-hint" id="substackHint">Substack detected — RSS feed will be set up automatically.</div>
-
-        <label for="newSourceCategory">Category</label>
-        <select id="newSourceCategory">
-          <option value="journalism">Investigative Journalism</option>
-          <option value="true-crime">True Crime & Justice</option>
-          <option value="books">Publishing & Industry</option>
-          <option value="podcasts">Podcasts to Books</option>
-          <option value="prizes">Literary Prizes</option>
-          <option value="substack" selected>Substack / Newsletter</option>
-          <option value="other">Other</option>
-        </select>
+        <label for="newSourceUrl">Paste any link — a Substack, news site, podcast, or publication</label>
+        <input type="text" id="newSourceUrl" placeholder="e.g. https://jmarriott.substack.com">
 
         <button class="add-source-btn" id="addSourceBtn" onclick="addSource()">Add Source</button>
         <div class="add-source-msg" id="addSourceMsg"></div>
@@ -1691,59 +1666,48 @@
     // ADD SOURCE
     // ============================================================
 
-    // Auto-detect Substack URLs and show hint
-    document.getElementById("newSourceUrl").addEventListener("input", function() {
-      const hint = document.getElementById("substackHint");
-      const catSelect = document.getElementById("newSourceCategory");
-      if (this.value.toLowerCase().includes("substack.com")) {
-        hint.classList.add("visible");
-        catSelect.value = "substack";
-      } else {
-        hint.classList.remove("visible");
-      }
-    });
-
     async function addSource() {
-      const nameEl = document.getElementById("newSourceName");
       const urlEl = document.getElementById("newSourceUrl");
-      const catEl = document.getElementById("newSourceCategory");
       const btn = document.getElementById("addSourceBtn");
       const msg = document.getElementById("addSourceMsg");
 
-      const name = nameEl.value.trim();
       const url = urlEl.value.trim();
-      const category = catEl.value;
 
-      if (!name) {
-        msg.textContent = "Please enter a source name.";
+      if (!url) {
+        msg.textContent = "Please paste a URL.";
         msg.className = "add-source-msg error";
         return;
       }
 
-      // Build source ID from name
-      const sourceId = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      // Basic URL validation
+      if (!url.includes(".") || url.length < 8) {
+        msg.textContent = "That doesn't look like a URL. Try pasting the full link.";
+        msg.className = "add-source-msg error";
+        return;
+      }
 
-      // Detect Substack and set scan method
-      const isSubstack = url.toLowerCase().includes("substack.com");
-      const scanMethod = isSubstack ? "rss" : "web_fetch";
-      const rssUrl = isSubstack ? url.replace(/\/$/, "") + "/feed" : "";
-      const sourceType = isSubstack ? "substack" : "web";
+      // Build a temporary source ID from the URL hostname
+      let cleanUrl = url;
+      if (!cleanUrl.startsWith("http")) cleanUrl = "https://" + cleanUrl;
+      let sourceId;
+      try {
+        sourceId = new URL(cleanUrl).hostname.replace(/^www\./, "").replace(/\./g, "-");
+      } catch (e) {
+        sourceId = url.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      }
 
       btn.disabled = true;
-      btn.textContent = "ADDING...";
+      btn.textContent = "SENDING...";
       msg.textContent = "";
       msg.className = "add-source-msg";
 
       const payload = {
         action: "add_source",
         source_id: sourceId,
-        name: name,
-        url: url || "",
-        type: sourceType,
-        scan_method: scanMethod,
-        rss_url: rssUrl,
-        category: category,
-        client_id: "peter-morgan"
+        url: cleanUrl,
+        status: "pending",
+        client_id: "peter-morgan",
+        requested_date: new Date().toISOString().split("T")[0]
       };
 
       if (CONFIG.masterSettingsEndpoint) {
@@ -1754,24 +1718,18 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
-          msg.textContent = "Source added! It will appear in the next daily scan.";
+          msg.textContent = "Source submitted! We'll check it and set it up for you.";
           msg.className = "add-source-msg success";
-          nameEl.value = "";
           urlEl.value = "";
-          document.getElementById("substackHint").classList.remove("visible");
         } catch (err) {
-          msg.textContent = "Could not reach the settings API. Source saved locally.";
+          msg.textContent = "Could not reach the server. Please try again later.";
           msg.className = "add-source-msg error";
         }
       } else {
-        // No master endpoint configured — show success anyway
-        // The source details are visible in the console for manual addition
-        console.log("New source (no API configured):", JSON.stringify(payload, null, 2));
-        msg.textContent = "Source noted! Configure the Master Settings API to sync automatically.";
+        console.log("New source request (no API configured):", JSON.stringify(payload, null, 2));
+        msg.textContent = "Source submitted! We'll check it and set it up for you.";
         msg.className = "add-source-msg success";
-        nameEl.value = "";
         urlEl.value = "";
-        document.getElementById("substackHint").classList.remove("visible");
       }
 
       btn.disabled = false;
